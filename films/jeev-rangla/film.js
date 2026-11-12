@@ -10,11 +10,12 @@ const ss = t => { t = clamp(t); return t * t * (3 - 2 * t); };
 const FH = 'Kalam';
 // sung lines: [start, mid-split, end] and the two halves
 // sung phrases, measured from the centre-panned vocal: [start, end] and the voiced segments inside (the pen pauses on breaths)
+const PACE = 1.5;                                                   // everything 1.5× slower than the measured phrase grid (the song plays at normal speed)
+const X = segs => segs.map(([a, b]) => [a * PACE, Math.min(DUR, b * PACE)]).filter(([a, b]) => a < DUR);
 const LINES = [
-  { s: 0, a: { text: 'जीव दंगला गुंगला रंगला', seg: [[0.11, .64], [.82, 3.04], [3.23, 3.41]] }, b: { text: 'असा पिरमाची आस तू', seg: [[3.76, 5.73]] } },
-  { s: 6.1, a: { text: 'जीव लागला लाभला ध्यास ह्यो', seg: [[6.32, 7.49], [7.71, 8.67], [8.85, 10.66]] }, b: { text: 'तुझा गहिवरला श्वास तू', seg: [[11.04, 11.5], [11.68, 12.8]] } },
-  { s: 13.0, a: { text: 'पैलतीरा नेशील साथ मला देशील', seg: [[13.18, 14.3], [14.56, 17.22]] }, b: { text: 'काळीज माझं तू', seg: [[17.71, 19.82]] },
-    c: { text: 'सुख भरतीला आलं नभं धरतीला आलं', seg: [[20.22, 22.62]] } },
+  { s: 0, a: { text: 'जीव दंगला गुंगला रंगला', seg: X([[0.11, .64], [.82, 3.04], [3.23, 3.41]]) }, b: { text: 'असा पिरमाची आस तू', seg: X([[3.76, 5.73]]) } },
+  { s: 6.1 * PACE, a: { text: 'जीव लागला लाभला ध्यास ह्यो', seg: X([[6.32, 7.49], [7.71, 8.67], [8.85, 10.66]]) }, b: { text: 'तुझा गहिवरला श्वास तू', seg: X([[11.04, 11.5], [11.68, 12.8]]) },
+    c: { text: 'पैलतीरा नेशील साथ मला देशील', seg: [[13.18 * PACE, DUR]], full: 'पैलतीरा नेशील साथ मला देशील' } },
 ];
 const voiced = (segs, t) => { const tot = segs.reduce((q, [a, b]) => q + b - a, 0); let d = 0; for (const [a, b] of segs) d += clamp(t - a, 0, b - a); return d / tot; };
 let ctx, T, SC = [];
@@ -61,7 +62,7 @@ function drawStrokes(list, p, t) {                                    // draw th
 // wash = { path, color, a, src:[x,y], t0, d }: revealed by a noisy circle growing from src; misregistered; darker dried edge
 function noisyCircle(cx, cy, R, seed) { const p = new Path2D(); for (let i = 0; i <= 64; i++) { const a = i / 64 * Math.PI * 2, n = .82 + .3 * (Math.sin(a * 5 + seed) * .5 + Math.sin(a * 11 + seed * 2) * .3 + hash(i + seed) * .4); i ? p.lineTo(cx + Math.cos(a) * R * n, cy + Math.sin(a) * R * n) : p.moveTo(cx + Math.cos(a) * R * n, cy + Math.sin(a) * R * n); } p.closePath(); return p; }
 function drawWash(w, lt) {
-  const u = seg(lt, w.t0, w.t0 + w.d); if (u <= 0) return;
+  const u = seg(lt, w.t0 * PACE, (w.t0 + w.d) * PACE); if (u <= 0) return;
   ctx.save(); ctx.translate(w.off?.[0] ?? 2.5, w.off?.[1] ?? 1.5);
   if (u < 1) ctx.clip(noisyCircle(w.src[0], w.src[1], 60 + ss(u) * (w.R || 1400), w.seed || 3));
   ctx.globalCompositeOperation = w.reserve ? 'source-over' : 'multiply'; ctx.globalAlpha = w.a; ctx.fillStyle = w.color; ctx.fill(w.path, w.rule || 'nonzero');
@@ -205,13 +206,13 @@ function scene4() {   // full moon over the river, the couple on the bank
 // ---------------- setup / render ----------------
 export function setup(canvas) {
   ctx = canvas.getContext('2d'); canvas.width = W; canvas.height = H; T = makeTextures(PAPER, 23);
-  SC = [scene1(), scene2(), scene3()];
+  SC = [scene1(), scene2()];
   return { dur: DUR, ev: [] };
 }
 function camAt(t) {                                                  // a slow pan down the page at each new line; slow push inside a page
   let y = 0;
-  LINES.forEach((L, i) => { if (i) y = lerp(y, i * PANEL, ss(seg(t, L.s - .45, L.s + .45))); });
-  const i = LINES.findLastIndex(L => t >= L.s - .45), L = LINES[Math.max(0, i)], end = LINES[i + 1]?.s ?? DUR;
+  LINES.forEach((L, i) => { if (i) y = lerp(y, i * PANEL, ss(seg(t, L.s - .7, L.s + .7))); });
+  const i = LINES.findLastIndex(L => t >= L.s - .7), L = LINES[Math.max(0, i)], end = LINES[i + 1]?.s ?? DUR;
   return [y + 860, 1.0 + .04 * seg(t, L.s, end)];
 }
 function handwrite(text, x, y, size, p, col = SEPIA) {               // written on left to right, with the pen nib riding the front
@@ -237,24 +238,24 @@ export function render(t) {
     if (lt < -.6) return;
     ctx.save(); ctx.translate(0, i * PANEL);
     // corner note: place and time, handwritten
-    handwrite(S.note, 300, 130, 40, seg(lt, .1, .8), '#6B4A33');
+    handwrite(S.note, 300, 130, 40, seg(lt, .1, 1.2), '#6B4A33');
     // washes under the ink, clipped to the fraying page region
     ctx.save(); ctx.clip(frayMask(i)); for (const w of S.W8) drawWash(w, lt);
     if (S.stars && lt > S.stars) { const r = mulberry(5), Mx = S.starMoon[0], My = S.starMoon[1]; ctx.fillStyle = PAPER; for (let k = 0; k < 60; k++) { const x = 60 + r() * 960, y = 180 + r() * 480; if (Math.hypot(x - Mx, y - My) < 160) continue; ctx.globalAlpha = seg(lt, S.stars + r(), S.stars + .6 + r()); ctx.beginPath(); ctx.arc(x, y, 1.5 + r() * 2, 0, 7); ctx.fill(); } ctx.globalAlpha = 1; }
     ctx.restore();
     // colour dabs spraying past the drawing's edge
     const r = mulberry(40 + i), cols = S.W8.map(w => w.color);
-    for (let k = 0; k < 26; k++) { const a = r() * Math.PI * 2, d = 1 + r() * .14, x = 540 + Math.cos(a) * 560 * d, y = 720 + Math.sin(a) * 640 * d; if (lt < 3 + r()) continue; ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.globalAlpha = .35; ctx.fillStyle = cols[k % cols.length]; ctx.beginPath(); ctx.ellipse(x, y, 6 + r() * 14, 4 + r() * 9, r() * 3, 0, 7); ctx.fill(); ctx.restore(); }
+    for (let k = 0; k < 26; k++) { const a = r() * Math.PI * 2, d = 1 + r() * .14, x = 540 + Math.cos(a) * 560 * d, y = 720 + Math.sin(a) * 640 * d; if (lt < (3 + r()) * PACE) continue; ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.globalAlpha = .35; ctx.fillStyle = cols[k % cols.length]; ctx.beginPath(); ctx.ellipse(x, y, 6 + r() * 14, 4 + r() * 9, r() * 3, 0, 7); ctx.fill(); ctx.restore(); }
     // ink: drawn in stroke order over the first ~3 s of the line
-    drawStrokes(S.st, ss(seg(lt, 0, 3.5)) * .15 + seg(lt, 0, 3.5) * .85, t);
+    drawStrokes(S.st, ss(seg(lt, 0, 3.5 * PACE)) * .15 + seg(lt, 0, 3.5 * PACE) * .85, t);
     if (S.late) drawStrokes(S.late.st, seg(lt, S.late.t0, S.late.t0 + S.late.d), t);
     // lamps: little flames once the colour has arrived (on twos)
-    if (S.lamps.length && lt > S.lampT) for (const [x, y] of S.lamps) { const f = .8 + .4 * hash(Math.floor(t * 12) + x); ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = '#F5B342'; ctx.globalAlpha = .8; ctx.beginPath(); ctx.ellipse(x, y - 6 * f, 6, 10 * f, 0, 0, 7); ctx.fill(); ctx.restore(); }
+    if (S.lamps.length && lt > S.lampT * PACE) for (const [x, y] of S.lamps) { const f = .8 + .4 * hash(Math.floor(t * 12) + x); ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = '#F5B342'; ctx.globalAlpha = .8; ctx.beginPath(); ctx.ellipse(x, y - 6 * f, 6, 10 * f, 0, 0, 7); ctx.fill(); ctx.restore(); }
     // the lyric, handwritten in the margin as it is sung (two halves)
     const pa = voiced(L.a.seg, t), pb = voiced(L.b.seg, t);
     handwrite(L.a.text, 540, 1390, 70, pa); handwrite(L.b.text, 540, 1500, 74, pb, '#8E2A1E');
     if (pb > .97) { ctx.strokeStyle = '#C0322B'; ctx.lineWidth = 3; ctx.globalAlpha = .6; ctx.beginPath(); ctx.moveTo(330, 1528); ctx.quadraticCurveTo(540, 1545 + 6 * Math.sin(i), 750, 1526); ctx.stroke(); ctx.globalAlpha = 1; }
-    if (L.c) handwrite(L.c.text, 540, 1615, 64, voiced(L.c.seg, t), '#2E3E6E');
+    if (L.c && L.c.seg.length) handwrite(L.c.text, 540, 1615, 64, voiced([[L.c.seg[0][0], L.c.seg[0][0] + 4.0 * PACE]], t), '#2E3E6E');
     ctx.restore();
   });
   // the closing note on the last page
