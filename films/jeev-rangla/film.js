@@ -3,20 +3,24 @@
 // transparent washes bloom from a source with a ragged wet front; the lyric is handwritten in the margin as it is sung.
 import { makeTextures, paperSheet, mulberry, hash, clamp, lerp } from './silk.js';
 
-export const DUR = 22.73;
+export const DUR = 48.5;                                           // full song 0:37.5 – 1:26
 const W = 1080, H = 1920, PANEL = 1700, SEPIA = '#3B2618', PAPER = '#F4ECDC', VIOLET = '#6E6488';
 const seg = (t, a, b) => clamp((t - a) / (b - a));
 const ss = t => { t = clamp(t); return t * t * (3 - 2 * t); };
 const FH = 'Kalam';
 // sung lines: [start, mid-split, end] and the two halves
 // sung phrases, measured from the centre-panned vocal: [start, end] and the voiced segments inside (the pen pauses on breaths)
-const PACE = 1.5;                                                   // everything 1.5× slower than the measured phrase grid (the song plays at normal speed)
-const X = segs => segs.map(([a, b]) => [a * PACE, Math.min(DUR, b * PACE)]).filter(([a, b]) => a < DUR);
+const PACE = 1.5, OFF = 37.5;                                        // drawing pace; Short clock = song time − 37.5 s
+// line start/end in the full song (from the channel owner): 0:39–0:50, 0:51–1:02, 1:04–1:14, 1:15–1:24.
+// Each line is written in two halves: the first over the first half of the line, the second over the rest.
+const LINE = (text1, text2, a, b) => { a -= OFF; b -= OFF; const m = a + (b - a) * .5; return { s: a - 1.2, a: { text: text1, seg: [[a, m - .2]] }, b: { text: text2, seg: [[m + .2, b]] } }; };
 const LINES = [
-  { s: 0, a: { text: 'जीव दंगला गुंगला रंगला', seg: X([[0.11, .64], [.82, 3.04], [3.23, 3.41]]) }, b: { text: 'असा पिरमाची आस तू', seg: X([[3.76, 5.73]]) } },
-  { s: 6.1 * PACE, a: { text: 'जीव लागला लाभला ध्यास ह्यो', seg: X([[6.32, 7.49], [7.71, 8.67], [8.85, 10.66]]) }, b: { text: 'तुझा गहिवरला श्वास तू', seg: X([[11.04, 11.5], [11.68, 12.8]]) },
-    c: { text: 'पैलतीरा नेशील साथ मला देशील', seg: [[13.18 * PACE, DUR]], full: 'पैलतीरा नेशील साथ मला देशील' } },
+  LINE('जीव दंगला गुंगला रंगला', 'असा पिरमाची आस तू', 39, 50),
+  LINE('जीव लागला लाभला ध्यास ह्यो', 'तुझा गहिवरला श्वास तू', 51, 62),
+  LINE('पैलतीरा नेशील साथ मला देशील', 'काळीज माझं तू', 64, 74),
+  LINE('सुख भरतीला आलं नभं धरतीला आलं', 'पुनवंचा चांद तू', 75, 84),
 ];
+LINES[0].s = 0;
 const voiced = (segs, t) => { const tot = segs.reduce((q, [a, b]) => q + b - a, 0); let d = 0; for (const [a, b] of segs) d += clamp(t - a, 0, b - a); return d / tot; };
 let ctx, T, SC = [];
 
@@ -103,34 +107,41 @@ function figPath(x, base, s, kind) {
 }
 
 // ---------------- the four drawings (panel coords: drawing in y 180..1250, lyric margin 1280..1640) ----------------
-function scene1() {   // village temple with a deepmal at sunrise
+function scene1() {   // romantic: a couple at a jhoola under a mango tree, sunset, two birds flying together
   const S = [], gy = 1180;
   S.push([[60, gy], [1020, gy]]);
-  S.push(rect(380, gy - 120, 320, 120)); S.push(rect(420, gy - 300, 240, 180)); S.push([[420, gy - 300], [450, gy - 450], [500, gy - 560], [540, gy - 620], [580, gy - 560], [630, gy - 450], [660, gy - 300]]);
-  for (let k = 1; k < 5; k++) S.push([[440 + k * 4, gy - 300 - k * 60], [640 - k * 4, gy - 300 - k * 60]]);
-  S.push(arc(540, gy - 640, 18, 22, 0, Math.PI * 2, 12)); S.push([[540, gy - 662], [540, gy - 720], [590, gy - 705], [540, gy - 692]]);
-  S.push([[505, gy], [505, gy - 90], [540, gy - 120], [575, gy - 90], [575, gy]]);
-  S.push([[230, gy], [242, gy - 520], [258, gy - 520], [270, gy]]); for (let k = 0; k < 9; k++) { const y = gy - 60 - k * 52; S.push([[236 - (k % 2) * 4, y], [210, y - 8]]); S.push([[264 + (k % 2) * 4, y], [290, y - 8]]); }
-  S.push(arc(250, gy - 540, 20, 14, Math.PI, Math.PI * 2, 10));
-  S.push([[60, gy - 160], [140, gy - 230], [220, gy - 160]]); S.push(rect(75, gy - 160, 130, 160)); S.push(rect(115, gy - 90, 40, 90));
-  S.push([[760, gy - 180], [860, gy - 260], [960, gy - 180]]); S.push(rect(775, gy - 180, 170, 180)); S.push(rect(820, gy - 100, 40, 100)); S.push(rect(890, gy - 140, 30, 30));
-  S.push(scallop(900, gy - 420, 120, 100, 1)); S.push([[880, gy - 300], [886, gy - 190]]); S.push([[915, gy - 300], [912, gy - 185]]);
-  S.push(arc(760, 420, 90, 90, 0, Math.PI * 2, 30));
-  for (let k = 0; k < 4; k++) S.push([[150 + k * 50, 360 + k * 6], [170 + k * 50, 350 + k * 6], [190 + k * 50, 360 + k * 6]]);
-  const st = S.map(p => stroke(p));
-  const sky = P2([[40, 160], [1040, 160], [1040, gy], [40, gy]]);
+  // the tree: a leaning trunk, one long branch, a scalloped crown
+  S.push([[300, gy], [320, gy - 300], [300, gy - 520], [330, gy - 640]]); S.push([[360, gy], [372, gy - 300], [360, gy - 500], [380, gy - 620]]);
+  S.push([[340, gy - 560], [520, gy - 600], [720, gy - 590], [800, gy - 560]]);
+  S.push(scallop(380, gy - 700, 300, 230, 11)); S.push(scallop(650, gy - 690, 220, 160, 12));
+  // the jhoola: two ropes from the branch, a plank
+  S.push([[600, gy - 597], [590, gy - 300]]); S.push([[720, gy - 592], [730, gy - 300]]); S.push(rect(570, gy - 300, 180, 16));
+  // her on the swing (saree, padar flowing), him standing beside, hands touching
+  S.push(arc(660, gy - 430, 22, 24, 0, Math.PI * 2, 16));
+  S.push([[640, gy - 405], [630, gy - 340], [600, gy - 300]]); S.push([[680, gy - 405], [700, gy - 330], [720, gy - 300]]);
+  S.push([[610, gy - 290], [600, gy - 200], [590, gy - 150]]); S.push([[700, gy - 290], [720, gy - 200], [735, gy - 150]]);
+  S.push([[645, gy - 410], [560, gy - 360], [520, gy - 380], [480, gy - 350]]);                      // padar in the breeze
+  S.push(arc(880, gy - 520, 24, 26, 0, Math.PI * 2, 16)); S.push([[860, gy - 548], [880, gy - 560], [905, gy - 548]]);
+  S.push([[862, gy - 495], [850, gy - 300], [856, gy]]); S.push([[898, gy - 495], [910, gy - 300], [904, gy]]);
+  S.push([[862, gy - 470], [790, gy - 400], [745, gy - 360]]);                                       // his hand toward hers
+  // sun low on the horizon, two birds
+  S.push(arc(860, gy - 120, 100, 100, Math.PI, Math.PI * 2, 24));
+  S.push([[700, 330], [722, 316], [744, 330]]); S.push([[760, 300], [780, 288], [800, 300]]);
+  for (let k = 0; k < 6; k++) S.push([[120 + k * 140, gy + 30], [170 + k * 140, gy + 30]]);
+  const nFig = 12, i0 = 8;
+  const st = S.map((p, i) => stroke(p, { fig: i >= i0 && i < i0 + nFig, w: i >= i0 && i < i0 + nFig ? 2.8 : 2.4 }));
   const W8 = [
-    { path: sky, color: '#F2C27A', a: .45, src: [760, 420], t0: 1.6, d: 2.2, seed: 1 },
-    { path: P2(arc(760, 420, 90, 90, 0, Math.PI * 2, 30)), color: '#E8833A', a: .6, src: [760, 420], t0: 1.4, d: .8, R: 300, seed: 2 },
-    { path: P2([[420, gy - 300], [450, gy - 450], [540, gy - 620], [630, gy - 450], [660, gy - 300], [660, gy - 120], [700, gy - 120], [700, gy], [380, gy], [380, gy - 120], [420, gy - 120]]), color: '#D8B98A', a: .55, src: [540, gy - 300], t0: 2.0, d: 1.6, seed: 3 },
-    { path: P2([[540, gy - 662], [540, gy - 720], [590, gy - 705], [540, gy - 692]]), color: '#D9442F', a: .8, src: [560, gy - 700], t0: 2.4, d: .5, R: 200, seed: 4 },
-    { path: P2([[230, gy], [242, gy - 520], [258, gy - 520], [270, gy]]), color: '#9A8C7A', a: .5, src: [250, gy - 300], t0: 2.2, d: 1.2, seed: 5 },
-    { path: U([P2([[60, gy - 160], [140, gy - 230], [220, gy - 160]]), P2([[760, gy - 180], [860, gy - 260], [960, gy - 180]])]), color: '#B8483E', a: .6, src: [500, gy - 200], t0: 2.3, d: 1.4, seed: 6 },
-    { path: P2(blob(900, gy - 420, 125, 105, 7)), color: '#7FA04A', a: .55, src: [900, gy - 420], t0: 2.5, d: 1.2, R: 400, seed: 7 },
-    { path: P2([[40, gy - 10], [1040, gy - 10], [1040, gy + 40], [40, gy + 40]]), color: '#C9A06A', a: .5, src: [540, gy], t0: 2.6, d: 1.2, seed: 8 },
+    { path: P2([[40, 160], [1040, 160], [1040, gy], [40, gy]]), color: '#F2B98A', a: .45, src: [860, gy - 120], t0: 1.4, d: 2.2, seed: 1 },
+    { path: P2([[40, 160], [1040, 160], [1040, 520], [40, 520]]), color: '#D98AA0', a: .3, src: [700, 200], t0: 2.0, d: 1.8, seed: 2 },
+    { path: P2(arc(860, gy - 120, 100, 100, Math.PI, Math.PI * 2, 24)), color: '#E8833A', a: .7, src: [860, gy - 150], t0: 1.6, d: .8, R: 300, seed: 3 },
+    { path: U([P2(blob(380, gy - 760, 300, 200, 4)), P2(blob(650, gy - 740, 220, 140, 5))]), color: '#6F9A4A', a: .55, src: [450, gy - 760], t0: 2.2, d: 1.4, R: 700, seed: 4 },
+    { path: P2([[300, gy], [320, gy - 300], [300, gy - 520], [330, gy - 640], [380, gy - 620], [360, gy - 500], [372, gy - 300], [360, gy]]), color: '#7A5236', a: .6, src: [340, gy - 300], t0: 2.4, d: 1.0, seed: 5 },
+    { path: P2([[640, gy - 405], [680, gy - 405], [720, gy - 300], [735, gy - 150], [590, gy - 150], [600, gy - 300]]), color: '#C0322B', a: .65, src: [660, gy - 300], t0: 2.6, d: .8, R: 400, seed: 6 },
+    { path: P2([[645, gy - 410], [560, gy - 360], [520, gy - 380], [480, gy - 350], [530, gy - 340], [600, gy - 360]]), color: '#E8A33A', a: .6, src: [560, gy - 370], t0: 2.8, d: .6, R: 300, seed: 7 },
+    { path: P2([[860, gy - 548], [880, gy - 560], [905, gy - 548], [905, gy - 538], [860, gy - 538]]), color: '#E8833A', a: .7, src: [880, gy - 548], t0: 2.8, d: .5, R: 200, seed: 8 },
+    { path: P2([[40, gy - 10], [1040, gy - 10], [1040, gy + 60], [40, gy + 60]]), color: '#B8A06A', a: .45, src: [540, gy], t0: 2.8, d: 1.2, seed: 9 },
   ];
-  const lamps = []; for (let k = 0; k < 9; k++) { const y = gy - 60 - k * 52; lamps.push([210, y - 10], [290, y - 10]); }
-  return { st, W8, lamps, lampT: 3.4, note: 'गावची पहाट' };
+  return { st, W8, lamps: [], note: 'आंब्याच्या झाडाखाली, सांजवेळ' };
 }
 function scene2() {   // the couple at the temple gate, a diya between them
   const S = [], gy = 1200;
@@ -200,13 +211,14 @@ function scene4() {   // full moon over the river, the couple on the bank
     { path: P2(blob(230, 780, 175, 150, 8)), color: '#2E4A38', a: .6, src: [230, 780], t0: 2.2, d: 1.0, R: 400, seed: 35 },
     { path: P2([[40, 1100], [1040, 1070], [1040, 1250], [40, 1250]]), color: '#4A4060', a: .5, src: [540, 1150], t0: 2.4, d: 1.0, seed: 36 },
   ];
-  return { st, W8, lamps: [], stars: true, note: 'पुनवेची रात' };
+  return { st, W8, lamps: [], stars: 2.6, starMoon: [M[0], M[1]], note: 'पुनवेची रात' };
 }
 
 // ---------------- setup / render ----------------
 export function setup(canvas) {
   ctx = canvas.getContext('2d'); canvas.width = W; canvas.height = H; T = makeTextures(PAPER, 23);
-  SC = [scene1(), scene2()];
+  SC = [scene1(), scene2(), scene3(), scene4()];
+  SC[2].W8 = SC[2].W8.slice(0, -4); delete SC[2].late; delete SC[2].stars;          // the moon belongs to page 4 now
   return { dur: DUR, ev: [] };
 }
 function camAt(t) {                                                  // a slow pan down the page at each new line; slow push inside a page
@@ -255,10 +267,10 @@ export function render(t) {
     const pa = voiced(L.a.seg, t), pb = voiced(L.b.seg, t);
     handwrite(L.a.text, 540, 1390, 70, pa); handwrite(L.b.text, 540, 1500, 74, pb, '#8E2A1E');
     if (pb > .97) { ctx.strokeStyle = '#C0322B'; ctx.lineWidth = 3; ctx.globalAlpha = .6; ctx.beginPath(); ctx.moveTo(330, 1528); ctx.quadraticCurveTo(540, 1545 + 6 * Math.sin(i), 750, 1526); ctx.stroke(); ctx.globalAlpha = 1; }
-    if (L.c && L.c.seg.length) handwrite(L.c.text, 540, 1615, 64, voiced([[L.c.seg[0][0], L.c.seg[0][0] + 4.0 * PACE]], t), '#2E3E6E');
-    ctx.restore();
+        ctx.restore();
   });
   // the closing note on the last page
+  if (t > 46) { ctx.save(); ctx.translate(0, 3 * PANEL); handwrite('— जीव रंगला · जोगवा (२००९)', 540, 1610, 38, seg(t, 46, 47.5), '#6B4A33'); ctx.restore(); }
   // paper grain over everything (granulation)
   ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalCompositeOperation = 'multiply'; ctx.globalAlpha = .35; const pat = ctx.createPattern(T.mottle, 'repeat'); ctx.fillStyle = pat; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
 }
