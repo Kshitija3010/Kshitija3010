@@ -1,0 +1,8 @@
+[
+{"id":"V1","text":"सुनो… आसमान, कुछ कहता है।","voice":"hf_alpha","lang":"hi","speed":0.95},
+{"id":"V2","text":"बारह दरवाज़े, बारह राज़।","voice":"hf_alpha","lang":"hi","speed":1.0},
+{"id":"V3","text":"कौन-सा दरवाज़ा, तुम्हारा है?","voice":"hf_alpha","lang":"hi","speed":1.0},
+{"id":"V4","text":"सितारों का शहर!","voice":"hf_alpha","lang":"hi","speed":0.95},
+{"id":"V5","text":"तुम्हारी राशि कौन-सी? कमेंट करो!","voice":"hf_alpha","lang":"hi","speed":1.05},
+{"id":"V6","text":"एस्ट्रोवर्स को फॉलो करो!","voice":"hf_alpha","lang":"hi","speed":1.0}
+]
