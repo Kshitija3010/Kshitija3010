@@ -1,0 +1,14 @@
+आकाश का नक्शा · The Map of the Sky — third-party assets
+
+Fonts
+- Teko (Indian Type Foundry), SIL Open Font License 1.1 — via @fontsource/teko (npm), fonts/
+- Poppins (Indian Type Foundry), SIL Open Font License 1.1 — via @fontsource/poppins (npm), fonts/ (licence text: fonts/OFL.txt)
+
+Voice
+- Kokoro-82M (hexgrad), Apache License 2.0, run offline through kokoro-onnx (MIT); voice hf_alpha (Hindi)
+
+Music samples
+- VCSL — Versilian Community Sample Library (frame drum, hand chimes, Nepalese bells, gong), CC0 1.0
+- Plucked strings (shamisen model, pizzicato bass) and the tanpura drone are synthesised in code (no samples)
+
+Everything else (pictures, foley, ambience) is generated in code.

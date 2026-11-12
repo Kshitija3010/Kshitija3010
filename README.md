@@ -47,7 +47,9 @@ Films I make with Lemo-Opuscar will appear here.
 
 | Film | Style | Link |
 |---|---|---|
-| *coming soon* | | |
+| **आकाश का नक्शा** · The Map of the Sky (Hindi, 2:06): the mysterious world of astrology, from Babylon to the 24° drift of the sky | Silkscreen Travel Poster | [▶ Watch](films/aakash-ka-naksha/aakash-ka-naksha.mp4) · [About](films/aakash-ka-naksha/) |
+
+<a href="films/aakash-ka-naksha/"><img src="films/aakash-ka-naksha/poster.jpg" alt="आकाश का नक्शा poster" width="600"></a>
 
 ---
 
