@@ -1,0 +1,6 @@
+Astroverse · राशियों की कहानी (12 films) — third-party assets
+- Astroverse logo and 5 s intro animation: supplied by the channel owner
+- Teko and Poppins fonts (Indian Type Foundry), SIL Open Font License 1.1, via @fontsource (npm)
+- Voice: Kokoro-82M (Apache 2.0) through kokoro-onnx (MIT), Hindi voice hf_alpha, offline
+- VCSL (Versilian Community Sample Library): frame drum, hand chimes, Nepalese bells, gong, CC0 1.0
+- Drone, plucked lead and bass are synthesised in code; all pictures, foley and ambience are generated in code
