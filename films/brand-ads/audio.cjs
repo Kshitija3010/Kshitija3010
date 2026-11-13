@@ -92,6 +92,18 @@ const P = {
     shimmer(8.4, 2.2, .04, 2500);
     impact(11.3, .8); [74, 78, 81, 86].forEach((m, i) => bell(11.4 + i * .14, m, .1, (i - 1.5) * .3));
   },
+  'saree-ink'() {
+    const SA = 50, B = 60 / 66;                                             // slower, calmer than the glass version
+    for (let t = 0, i = 0; t < DUR; t += B, i++) ks(t, mtof([SA - 5, SA, SA, SA - 12][i % 4]), 3.5, .24, (i % 4 - 1.5) * .2, .25);
+    const raag = [62, 64, 66, 68, 69, 71, 73, 74], phrase = [4, 3, 4, 5, 4, 2, 1, 2, 0, 1, 2, 4, 3, 4];
+    phrase.forEach((n, i) => ks(.9 + i * B * .9 + (i % 3 === 2 ? .1 : 0), mtof(raag[n]), 1.4, .26, .25, .65, i % 4 === 3 ? .03 : 0));
+    tone(F, .2, 900, 300, .15, .35, 25); noise(F, .2, .3, .15, 12, .3);                              // ink drop
+    const swish = (t0, d, a) => whoosh(t0, d, a, 250, 900);                                          // soft brush strokes
+    swish(.6, 1.8, .22); swish(1.6, 1.6, .1); swish(4.1, .8, .15); swish(11.2, 1, .18);
+    for (let k = 0; k < 3; k++) whoosh(4.5 + k * .4, 1.2, .08, 150, 500);                            // cloth in the wind
+    for (let j = 0; j < 16; j++) { const t = 9.1 + j * .1; tone(F, t, 320, 260, .06, .25, 50, (j % 2 ? .3 : -.3)); noise(F, t, .03, .12, 120, .8); }   // shuttle
+    impact(12.8, .55); [74, 78, 81, 86].forEach((m, i) => bell(11.5 + i * .16, m, .08, (i - 1.5) * .3));
+  },
   jewellery() {
     const B = 60 / 76, prog = [[52, 64, 68, 71, 78], [49, 61, 64, 68, 75], [45, 57, 61, 64, 71], [47, 59, 63, 66, 73]];
     for (let b = 0; b * 4 * B < DUR; b++) {

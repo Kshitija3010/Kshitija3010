@@ -143,14 +143,16 @@ L.run = def => {
       sc.clearRect(0, 0, W, H); sc.save(); s.f(sc, t - s.a, s.b - s.a); sc.restore();
       o.globalAlpha = i === 0 ? 1 : ss((t - s.a) / .4); o.drawImage(scC, 0, 0); o.globalAlpha = 1;
     });
-    bl.clearRect(0, 0, W / 2, H / 2); bl.filter = 'blur(12px) brightness(1.05) contrast(2)'; bl.drawImage(cv, 0, 0, W / 2, H / 2); bl.filter = 'none';
-    o.globalCompositeOperation = 'screen'; o.globalAlpha = def.bloom ?? .4; o.drawImage(blC, 0, 0, W, H);
+    if ((def.bloom ?? .4) > 0) {
+      bl.clearRect(0, 0, W / 2, H / 2); bl.filter = 'blur(12px) brightness(1.05) contrast(2)'; bl.drawImage(cv, 0, 0, W / 2, H / 2); bl.filter = 'none';
+      o.globalCompositeOperation = 'screen'; o.globalAlpha = def.bloom ?? .4; o.drawImage(blC, 0, 0, W, H);
+    }
     o.globalCompositeOperation = 'source-over'; o.globalAlpha = 1;
-    const vg = o.createRadialGradient(W / 2, H / 2, H * .28, W / 2, H / 2, H * .75); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.6)');
+    const vg = o.createRadialGradient(W / 2, H / 2, H * .28, W / 2, H / 2, H * .75); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, def.vignette || 'rgba(0,0,0,.6)');
     o.fillStyle = vg; o.fillRect(0, 0, W, H);
     o.save(); o.globalCompositeOperation = 'overlay'; o.globalAlpha = .07; o.fillStyle = grain[Math.floor(t * FPS) % 4];
     o.translate(-((t * 997) % 512), -((t * 577) % 512)); o.fillRect(0, 0, W + 512, H + 512); o.restore();
-    o.globalAlpha = Math.max(1 - ss(t / .5), ss(seg(t, DUR - .7, DUR))); o.fillStyle = '#000'; o.fillRect(0, 0, W, H); o.globalAlpha = 1;
+    o.globalAlpha = Math.max(1 - ss(t / .5), ss(seg(t, DUR - .7, DUR))); o.fillStyle = def.fade || '#000'; o.fillRect(0, 0, W, H); o.globalAlpha = 1;
   }
   window.FILM = { W, H, FPS, DUR, render, frame: (t, q = .92) => { render(t); return cv.toDataURL('image/jpeg', q); } };
   window.ready = true;
