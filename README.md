@@ -49,6 +49,7 @@ Films I make with Lemo-Opuscar will appear here.
 |---|---|---|
 | **आकाश का नक्शा** · The Map of the Sky (Hindi, 2:06): the mysterious world of astrology, from Babylon to the 24° drift of the sky | Silkscreen Travel Poster | [▶ Watch](films/aakash-ka-naksha/aakash-ka-naksha.mp4) · [About](films/aakash-ka-naksha/) |
 | **Astroverse · राशियों की कहानी**: 12 episodes, one per rashi (Hindi, 1:38 each, Shorts and 16:9) | Silkscreen Travel Poster | [▶ All 12](astroverse-rashi-series/) |
+| **प्राचीन रसोई · The Ancient Kitchen** (Kathaverse): the world's oldest foods, Ep 1 दुनिया की पहली रोटी (Hindi, 1:53, Shorts and 16:9) | Tablet Sketch Explainer | [▶ Series](pracheen-rasoi-series/) |
 
 <a href="films/aakash-ka-naksha/"><img src="films/aakash-ka-naksha/poster.jpg" alt="आकाश का नक्शा poster" width="600"></a>
 
