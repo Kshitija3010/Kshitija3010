@@ -1,0 +1,7 @@
+Kathaverse · दादी की रसोई का टूर (1930s Rubber Hose Cartoon): third-party assets
+- Kathaverse logo: supplied by the channel owner (the 5 s intro is animated in code from it)
+- Style: 1930s Rubber Hose Cartoon from Lemo-Opuscar by LemoLab (engine: toon.js, chars.js parts, film gate, mixer and score helpers; MIT). Lotu-ram and the seven kitchen tools are new designs
+- Fonts (SIL Open Font License 1.1): Yatra One, Rozha One, Tiro Devanagari Hindi
+- Voice: Kokoro-82M (Apache 2.0) through kokoro-onnx (MIT), Hindi voice hm_omega, offline, through a 1930s radio-microphone chain
+- Samples (CC0): VS Chamber Orchestra: Community Edition and Versilian Community Sample Library (Versilian Studios); banjo is a physical model in code
+- Foley, film damage and the optical-soundtrack ageing are made in code
